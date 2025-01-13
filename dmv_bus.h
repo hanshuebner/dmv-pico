@@ -1,7 +1,8 @@
-#ifndef GPIO_BITFIELDS_H
-#define GPIO_BITFIELDS_H
+#ifndef DMV_BUS_H
+#define DMV_BUS_H
 
 #include <stdint.h>
+#include <hardware/gpio.h>
 
 // GPIO Port Bitfield Mapping for Raspberry Pi Pico
 // This structure assumes a 32-bit GPIO register
@@ -17,12 +18,25 @@ typedef struct {
     uint32_t ifsel0_n : 1; // Interface Select 0 (negative logic)
     uint32_t ifsel1_n : 1; // Interface Select 1 (negative logic)
     uint32_t reserved : 15; // Reserved bits (to pad to 32 bits)
-} gpio_port_t;
+} dmv_bus_t;
 
-// Function to set the GPIO port
-void set_gpio_port(volatile gpio_port_t *port, uint32_t value);
+typedef union {
+    uint32_t raw;
+    dmv_bus_t bits;
+} dmv_bus_union_t;
 
-// Function to get the GPIO port value
-uint32_t get_gpio_port(volatile gpio_port_t *port);
+static inline dmv_bus_t dmv_bus_get() {
+    dmv_bus_union_t state;
+    state.raw = gpio_get_all();
+    return state.bits;
+}
 
-#endif // GPIO_BITFIELDS_H
+static inline void dmv_bus_put(dmv_bus_t bus_state) {
+    dmv_bus_union_t state;
+    state.bits = bus_state;
+    gpio_put_all(state.raw);
+}
+
+const uint32_t dmv_bus_data_mask = 0x00000ff0;
+
+#endif // DMV_BUS_H
