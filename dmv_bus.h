@@ -18,25 +18,13 @@ typedef struct {
     uint32_t ifsel0_n : 1; // Interface Select 0 (negative logic)
     uint32_t ifsel1_n : 1; // Interface Select 1 (negative logic)
     uint32_t reserved : 15; // Reserved bits (to pad to 32 bits)
-} dmv_bus_t;
+} DmvBus;
 
 typedef union {
     uint32_t raw;
-    dmv_bus_t bits;
-} dmv_bus_union_t;
+    DmvBus reg;
+} DmvBusUnion;
 
-static inline dmv_bus_t dmv_bus_get() {
-    dmv_bus_union_t state;
-    state.raw = gpio_get_all();
-    return state.bits;
-}
-
-static inline void dmv_bus_put(dmv_bus_t bus_state) {
-    dmv_bus_union_t state;
-    state.bits = bus_state;
-    gpio_put_all(state.raw);
-}
-
-const uint32_t dmv_bus_data_mask = 0x00000ff0;
+static const uint32_t dmv_bus_data_mask = 0x00000ff0;
 
 #endif // DMV_BUS_H

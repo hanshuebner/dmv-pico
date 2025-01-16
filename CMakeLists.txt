@@ -9,6 +9,9 @@ add_executable(dmv_pico
         dmv_bus.h
         dmv_2651.c
         signetics_2651_uart.h
+        signetics_2651_debug.c
+        signetics_2651_debug.h
+        dmv_2651.h
 )
 pico_enable_stdio_usb(dmv_pico 1)
 pico_enable_stdio_uart(dmv_pico 0)
