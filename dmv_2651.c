@@ -83,6 +83,8 @@ handle_dmv_bus() {
                 // read command register
                 state.reg.d = command_register.raw;
                 read_syn_ptr = 0;
+                write_mode_ptr = 0;
+                write_syn_ptr = 0;
                 break;
             default:
             }
