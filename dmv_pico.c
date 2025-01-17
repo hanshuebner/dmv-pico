@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <pico/stdio.h>
-#include <pico/time.h>
 #include <pico/multicore.h>
+#include <tusb.h>
 #include "dmv_2651.h"
 #include "dmv_bus.h"
 #include "signetics_2651_debug.h"
@@ -29,16 +29,18 @@ int main(void)
 {
     stdio_init_all();
 
+    while (!stdio_usb_connected()) {
+        sleep_ms(100);
+    }
+    printf("Ready\n");
+
     printf("Starting second processor\n");
     multicore_launch_core1(handle_dmv_bus);
 
     printf("Waiting for data\n");
     for (;;) {
         uint32_t data = multicore_fifo_pop_blocking();
-        printf("Received 0x%08x\n", data);
-        DmvBusUnion bus;
-        bus.raw = data;
-        print_DmvBus(&bus);
+        putchar(data & 0xff);
         //print_CommandRegister(command_register.reg);
         //print_ModeRegister1(mode_register1.reg);
         //print_ModeRegister2(mode_register2.reg);
