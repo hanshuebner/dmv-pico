@@ -9,5 +9,6 @@ extern volatile CommandRegisterUnion command_register;
 extern volatile StatusRegisterUnion status_register;
 
 void handle_dmv_bus();
+void handle_dmv_bus_test();
 
 #endif // DMV_2651_H

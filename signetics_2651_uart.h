@@ -1,6 +1,8 @@
 #ifndef SIGNETICS_2651_UART_H
 #define SIGNETICS_2651_UART_H
 
+#pragma pack(1)
+
 #include <stdint.h>
 
 // Mode Register 1 (MR1) Definitions
@@ -140,5 +142,7 @@ typedef union {
     uint8_t raw;
     StatusRegister reg;
 } StatusRegisterUnion;
+
+#pragma pack()
 
 #endif // SIGNETICS_2651_UART_H

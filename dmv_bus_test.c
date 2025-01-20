@@ -31,24 +31,17 @@ int main(void)
     while (!stdio_usb_connected()) {
         sleep_ms(100);
     }
-    printf("Ready\n");
+    printf("Bus test ready\n");
 
     printf("Starting second processor\n");
-    multicore_launch_core1(handle_dmv_bus);
+    multicore_launch_core1(handle_dmv_bus_test);
 
-    printf("Waiting for data\n");
+    printf("Running\n");
+    printf("mask is 0x%08x\n", dmv_bus_data_mask);
+    uint8_t input = 0;
     for (;;) {
-        if (multicore_fifo_rvalid()) {
-            uint32_t data = multicore_fifo_pop_blocking();
-            putchar(data & 0xff);
-        }
-        int input = stdio_getchar_timeout_us(0);
-        if (input != PICO_ERROR_TIMEOUT) {
-            multicore_fifo_push_blocking(input);
-        }
-        //print_CommandRegister(command_register.reg);
-        //print_ModeRegister1(mode_register1.reg);
-        //print_ModeRegister2(mode_register2.reg);
-        //print_StatusRegister(status_register.reg);
+//        multicore_fifo_push_blocking(input++);
+        uint32_t wrote = multicore_fifo_pop_blocking_inline();
+        printf("Wrote 0x%08X\n", wrote);
     }
 }

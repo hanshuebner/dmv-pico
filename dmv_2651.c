@@ -10,9 +10,8 @@ static const int BITS_IN_USE = 17;
 void
 init_gpio() {
     for (int i = 0; i < BITS_IN_USE; i++) {
-        gpio_set_function(i, GPIO_FUNC_NULL);
-        gpio_disable_pulls(i);
-        gpio_set_input_enabled(i, true);
+        gpio_init(i);
+//        gpio_set_input_enabled(i, true);
     }
 }
 
@@ -36,8 +35,7 @@ handle_dmv_bus() {
 
     init_gpio();
     DmvBusUnion state;
-    DmvBusUnion old_state;
-    old_state.raw = state.raw = gpio_get_all();
+    state.raw = gpio_get_all();
 
     // ReSharper disable once CppDFAEndlessLoop
     while (true) {
@@ -152,5 +150,40 @@ handle_dmv_bus() {
                 state.raw = gpio_get_all();
             } while (state.reg.ifsel0_n == 0);
         }
+    }
+}
+
+// test code
+void
+handle_dmv_bus_test() {
+
+    init_gpio();
+    DmvBusUnion state;
+    state.raw = gpio_get_all();
+    uint8_t data = 0;
+
+    // ReSharper disable once CppDFAEndlessLoop
+    while (true) {
+        do {
+            state.raw = gpio_get_all();
+        } while (state.reg.ifsel0_n || state.reg.ior_n);
+
+        // read - switch data direction, present bits on GPIO
+        gpio_set_dir_out_masked(dmv_bus_data_mask);
+#if 0
+        if (multicore_fifo_rvalid()) {
+            data = multicore_fifo_pop_blocking_inline();
+        }
+#endif
+        state.reg.d = data++;
+        gpio_put_masked(dmv_bus_data_mask, state.raw);
+        multicore_fifo_push_blocking_inline(state.raw);
+
+        // wait until end of cycle
+        do {
+            state.raw = gpio_get_all();
+        } while (!state.reg.ifsel0_n);
+        // interface deselected, switch data bit direction back to input
+        gpio_set_dir_in_masked(dmv_bus_data_mask);
     }
 }

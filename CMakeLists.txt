@@ -1,19 +1,34 @@
 cmake_minimum_required(VERSION 3.13)
 include(pico_sdk_import.cmake)
 project(dmv_pico C CXX ASM)
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
+
 pico_sdk_init()
-add_executable(dmv_pico
-        dmv_pico.c
-        dmv_bus.h
+
+# Function to set up targets
+function(set_up_target target_name)
+    add_executable(${target_name} ${ARGN})
+
+    pico_enable_stdio_usb(${target_name} 1)
+    pico_enable_stdio_uart(${target_name} 0)
+    pico_add_extra_outputs(${target_name})
+    target_link_libraries(${target_name} pico_stdlib pico_multicore)
+endfunction()
+
+# Shared source files
+set(SHARED_SOURCES
         dmv_2651.c
+        dmv_bus.h
         signetics_2651_uart.h
         signetics_2651_debug.c
         signetics_2651_debug.h
         dmv_2651.h
 )
-pico_enable_stdio_usb(dmv_pico 1)
-pico_enable_stdio_uart(dmv_pico 0)
-pico_add_extra_outputs(dmv_pico)
-target_link_libraries(dmv_pico pico_stdlib pico_multicore)
+
+# Main application
+set_up_target(dmv_pico dmv_pico.c ${SHARED_SOURCES})
+
+# Second executable with the same settings
+set_up_target(dmv_bus_test dmv_bus_test.c ${SHARED_SOURCES})

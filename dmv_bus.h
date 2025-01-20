@@ -8,17 +8,18 @@
 // This structure assumes a 32-bit GPIO register
 // Adjust the bit positions as needed for your specific use case
 
+#pragma pack(1)
 typedef struct {
-    uint32_t irq : 1;      // Interrupt Request
-    uint32_t reset_n : 1;  // Reset (negative logic)
-    uint32_t ior_n : 1;    // I/O Read (negative logic)
-    uint32_t iow_n : 1;    // I/O Write (negative logic)
-    uint32_t d : 8;        // Data bits (d0 to d7)
-    uint32_t ba : 3;       // Address bits (ba2 to ba0)
-    uint32_t ifsel0_n : 1; // Interface Select 0 (negative logic)
-    uint32_t ifsel1_n : 1; // Interface Select 1 (negative logic)
-    uint32_t reserved : 15; // Reserved bits (to pad to 32 bits)
+    unsigned int irq : 1;      // Interrupt Request
+    unsigned int reset_n : 1;  // Reset (negative logic)
+    unsigned int ior_n : 1;    // I/O Read (negative logic)
+    unsigned int iow_n : 1;    // I/O Write (negative logic)
+    unsigned int d : 8;        // Data bits (d0 to d7)
+    unsigned int ba : 3;       // Address bits (ba2 to ba0)
+    unsigned int ifsel0_n : 1; // Interface Select 0 (negative logic)
+    unsigned int ifsel1_n : 1; // Interface Select 1 (negative logic)
 } DmvBus;
+#pragma pack()
 
 typedef union {
     uint32_t raw;
